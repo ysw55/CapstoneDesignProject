@@ -23,7 +23,7 @@ public class Menu {
     private String componentNames;
 
     // 재고 관리
-    private Integer stock = 50;
+    private Integer stock = 10;
 
     protected Menu() {}
 

@@ -36,6 +36,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- H2 (로컬 테스트용 파일 DB, local 프로필에서 사용) -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Lombok (Annotatons for Getters/Setters) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
