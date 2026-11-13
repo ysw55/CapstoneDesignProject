@@ -236,8 +236,18 @@ function App() {
           cartItems: savedCart ? JSON.parse(savedCart) : []
         })
       })
-      .then(res => {
-        if (!res.ok) throw new Error("승인 실패");
+      .then(async res => {
+        if (!res.ok) {
+          // 서버가 돌려준 실제 오류 내용을 함께 보여주기 위해 응답 본문을 읽음
+          let detail = '';
+          try {
+            const body = await res.json();
+            detail = body.message || JSON.stringify(body);
+          } catch (e) {
+            detail = '';
+          }
+          throw new Error(`승인 실패 (HTTP ${res.status}) ${detail}`.trim());
+        }
         return res.json();
       })
       .then(data => {
@@ -256,7 +266,7 @@ function App() {
       .catch(err => {
         console.error("결제 승인 오류:", err);
         isPaymentConfirming = false;
-        showToast("결제 승인에 실패했습니다. 다시 시도해 주세요.");
+        showToast(`결제 승인에 실패했습니다. 다시 시도해 주세요.\n${err.message || ''}`.substring(0, 300));
         setActiveModal('MAIN');
         window.history.replaceState({}, document.title, window.location.pathname);
       });
