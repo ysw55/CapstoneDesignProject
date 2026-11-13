@@ -222,9 +222,11 @@ function App() {
       setActiveModal('PROCESSING');
       setIsSplashScreen(false); // 스플래시 화면 건너뛰기
 
-      // 3. 백엔드에 결제 승인 요청 보냄
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://malmal-coffee.duckdns.org';
-      fetch(`${API_BASE_URL}/api/payments/confirm`, {
+      // 3. 결제 승인 요청 보냄
+      // 결제 승인은 같은 도메인의 Vercel 서버리스 함수(/api/payments/confirm)에서 처리
+      // (로컬 개발 시에는 VITE_PAYMENT_CONFIRM_URL 로 다른 주소 지정 가능)
+      const CONFIRM_URL = import.meta.env.VITE_PAYMENT_CONFIRM_URL || '/api/payments/confirm';
+      fetch(CONFIRM_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -878,7 +880,12 @@ function App() {
   const handlePaymentSelection = (method) => {
     setLastProcessingPaymentMethod(method === "CASH" ? "현금" : "카드");
     if (method === "CARD") {
-      const clientKey = "test_ck_GjLJoQ1aVZbWyYDyDdalVw6KYe2R";
+      // 토스 클라이언트 키(test_ck_...)는 환경변수(VITE_TOSS_CLIENT_KEY)로 설정
+      const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY;
+      if (!clientKey) {
+        showToast("토스 클라이언트 키가 설정되지 않았습니다. (VITE_TOSS_CLIENT_KEY)");
+        return;
+      }
       const tossPayments = window.TossPayments ? window.TossPayments(clientKey) : null;
       if (tossPayments) {
         if (totalAmount <= 0) {
